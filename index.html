@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sudoku Solver</title>
+    <style>
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+      }
+      table {
+        table-layout: fixed;
+        border-collapse: collapse;
+        border: 3px solid black;
+      }
+      td {
+        width: 2rem;
+        height: 2rem;
+        border: 1px solid black;
+        padding: 0;
+        text-align: center;
+        font-size: 20px;
+        user-select: none;
+      }
+      td:hover {
+        cursor: pointer;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .cell-right {
+        border-right: 3px solid black;
+      }
+
+      .row-bottom {
+        border-bottom: 3px solid black;
+      }
+
+      button {
+        padding: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <table id="sudoku_table">
+        <tbody>
+          <tr>
+            <td></td>
+            <td></td>
+            <td class="cell-right"></td>
+            <td></td>
+            <td></td>
+            <td class="cell-right"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td class="cell-right"></td>
+            <td></td>
+            <td></td>
+            <td class="cell-right"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr class="row-bottom">
+            <td></td>
+            <td></td>
+            <td class="cell-right"></td>
+            <td></td>
+            <td></td>
+            <td class="cell-right"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td class="cell-right"></td>
+            <td></td>
+            <td></td>
+            <td class="cell-right"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td class="cell-right"></td>
+            <td></td>
+            <td></td>
+            <td class="cell-right"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr class="row-bottom">
+            <td></td>
+            <td></td>
+            <td class="cell-right"></td>
+            <td></td>
+            <td></td>
+            <td class="cell-right"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td class="cell-right"></td>
+            <td></td>
+            <td></td>
+            <td class="cell-right"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td class="cell-right"></td>
+            <td></td>
+            <td></td>
+            <td class="cell-right"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td class="cell-right"></td>
+            <td></td>
+            <td></td>
+            <td class="cell-right"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+      <button id="sudoku_btn">Решить</button>
+    </div>
+  </body>
+  <script>
+    let sel = null;
+    function select(el) {
+      if (el.nodeName !== "TD") return;
+      if (sel !== null) {
+        sel.style.backgroundColor = "";
+      }
+      sel = el;
+      sel.style.backgroundColor = "#ffd6d6";
+    }
+
+    function deselect() {
+      sel.style.backgroundColor = "";
+      sel = null;
+    }
+
+    const table = document.getElementById("sudoku_table");
+    const tbody = table.firstElementChild;
+    table.addEventListener("click", (ev) => {
+      if (sel === ev.target) {
+        deselect();
+      } else {
+        select(ev.target);
+      }
+    });
+
+    document.addEventListener("keydown", (ev) => {
+      if (ev.keyCode >= 49 && ev.keyCode <= 57 && sel != null) {
+        sel.textContent = ev.keyCode - 48;
+        return;
+      }
+
+      if ([8, 46, 48].includes(ev.keyCode)) {
+        sel.textContent = null;
+        return;
+      }
+
+      if (ev.keyCode === 27) {
+        deselect();
+        return;
+      }
+
+      if (ev.keyCode >= 37 && ev.keyCode <= 40 && sel == null) {
+        select(tbody.children[0].children[0]);
+        return;
+      }
+
+      switch (ev.keyCode) {
+        case 37:
+          if (sel !== null && sel.previousElementSibling !== null) {
+            select(sel.previousElementSibling);
+          }
+          break;
+        case 38:
+          if (sel !== null && sel.parentElement.previousElementSibling !== null) {
+            select(sel.parentElement.previousElementSibling.children[sel.cellIndex]);
+          }
+          break;
+        case 39:
+          if (sel !== null && sel.nextElementSibling !== null) {
+            select(sel.nextElementSibling);
+          }
+          break;
+        case 40:
+          if (sel !== null && sel.parentElement.nextElementSibling !== null) {
+            select(sel.parentElement.nextElementSibling.children[sel.cellIndex]);
+          }
+          break;
+      }
+    });
+
+    async function solve() {
+      const body = Array.from(tbody.children).map((row) =>
+        Array.from(row.children).map((el) => (el.textContent ? parseInt(el.textContent) : 0))
+      );
+
+      const response = await fetch("/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      const result = await response.json();
+
+      const rows = tbody.children;
+      for (let i = 0; i < result.length; i++) {
+        for (let j = 0; j < result[i].length; j++) {
+          if (result[i][j] > 0) {
+            rows[i].children[j].textContent = result[i][j];
+          }
+        }
+      }
+    }
+
+    const btn = document.getElementById("sudoku_btn");
+    btn.addEventListener("click", solve);
+  </script>
+</html>
