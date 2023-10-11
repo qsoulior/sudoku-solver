@@ -12,22 +12,42 @@
         min-height: 100vh;
         margin: 0;
       }
-      table {
+
+      #sudoku_values {
         table-layout: fixed;
         border-collapse: collapse;
         border: 3px solid black;
       }
-      td {
-        width: 2rem;
-        height: 2rem;
+
+      #sudoku_values > tbody > tr:nth-child(3n) {
+        border-bottom: 3px solid black;
+      }
+
+      .sudoku-value {
+        width: 2.5rem;
+        height: 2.5rem;
         border: 1px solid black;
         padding: 0;
-        text-align: center;
         font-size: 20px;
         user-select: none;
       }
-      td:hover {
+
+      .sudoku-value:hover {
         cursor: pointer;
+      }
+
+      .sudoku-value:nth-child(3n) {
+        border-right: 3px solid black;
+      }
+
+      .sudoku-value > div {
+        width: 2rem;
+        height: 2rem;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50px;
       }
 
       .container {
@@ -36,166 +56,125 @@
         gap: 1rem;
       }
 
-      .cell-right {
-        border-right: 3px solid black;
-      }
-
-      .row-bottom {
-        border-bottom: 3px solid black;
-      }
-
-      button {
+      #sudoku_btn,
+      #sudoku_select {
         padding: 0.5rem;
+      }
+
+      #sudoku_colors {
+        table-layout: fixed;
+        border-collapse: collapse;
+      }
+
+      .sudoku-color {
+        padding: 0;
+        width: 2.5rem;
+        height: 2.5rem;
+        border: 1px solid #9a9aa7;
+      }
+
+      .sudoku-color:hover {
+        cursor: pointer;
       }
     </style>
   </head>
   <body>
     <div class="container">
-      <table id="sudoku_table">
+      <table id="sudoku_values">
+        <tbody></tbody>
+      </table>
+      <table id="sudoku_colors" hidden="true">
         <tbody>
           <tr>
-            <td></td>
-            <td></td>
-            <td class="cell-right"></td>
-            <td></td>
-            <td></td>
-            <td class="cell-right"></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td class="cell-right"></td>
-            <td></td>
-            <td></td>
-            <td class="cell-right"></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr class="row-bottom">
-            <td></td>
-            <td></td>
-            <td class="cell-right"></td>
-            <td></td>
-            <td></td>
-            <td class="cell-right"></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td class="cell-right"></td>
-            <td></td>
-            <td></td>
-            <td class="cell-right"></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td class="cell-right"></td>
-            <td></td>
-            <td></td>
-            <td class="cell-right"></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr class="row-bottom">
-            <td></td>
-            <td></td>
-            <td class="cell-right"></td>
-            <td></td>
-            <td></td>
-            <td class="cell-right"></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td class="cell-right"></td>
-            <td></td>
-            <td></td>
-            <td class="cell-right"></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td class="cell-right"></td>
-            <td></td>
-            <td></td>
-            <td class="cell-right"></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td class="cell-right"></td>
-            <td></td>
-            <td></td>
-            <td class="cell-right"></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td class="sudoku-color" style="background-color: rgba(255, 0, 0, 0.25)"></td>
+            <td class="sudoku-color" style="background-color: rgba(255, 255, 0, 0.25)"></td>
+            <td class="sudoku-color" style="background-color: rgba(255, 0, 255, 0.25)"></td>
+            <td class="sudoku-color" style="background-color: rgba(0, 255, 0, 0.25)"></td>
+            <td class="sudoku-color" style="background-color: rgba(0, 255, 255, 0.25)"></td>
+            <td class="sudoku-color" style="background-color: rgba(0, 0, 255, 0.25)"></td>
+            <td class="sudoku-color" style="background-color: rgba(255, 100, 0, 0.25)"></td>
+            <td class="sudoku-color" style="background-color: rgba(150, 150, 150, 0.25)"></td>
+            <td class="sudoku-color" style="background-color: rgba(255, 255, 255, 0.25)"></td>
           </tr>
         </tbody>
       </table>
+      <select id="sudoku_select">
+        <option value="1">Классика</option>
+        <option value="2">Диагональ</option>
+        <option value="3">Чет-нечет</option>
+        <option value="4">Фигуры</option>
+      </select>
       <button id="sudoku_btn">Решить</button>
+      <div id="sudoku_error"></div>
     </div>
   </body>
   <script>
     let sel = null;
     function select(el) {
-      if (el.nodeName !== "TD") return;
       if (sel !== null) {
-        sel.style.backgroundColor = "";
+        deselect();
       }
       sel = el;
-      sel.style.backgroundColor = "#ffd6d6";
+      sel.style.boxShadow = "inset 0px 0px 0px 3px red";
     }
 
     function deselect() {
-      sel.style.backgroundColor = "";
-      sel = null;
+      if (sel != null) {
+        sel.style.boxShadow = "";
+        sel = null;
+      }
     }
 
-    const table = document.getElementById("sudoku_table");
+    // table init
+    const table = document.getElementById("sudoku_values");
     const tbody = table.firstElementChild;
-    table.addEventListener("click", (ev) => {
-      if (sel === ev.target) {
-        deselect();
-      } else {
-        select(ev.target);
+
+    for (let i = 0; i < 9; i++) {
+      const tr = document.createElement("tr");
+      for (let j = 0; j < 9; j++) {
+        const td = document.createElement("td");
+        td.classList.add("sudoku-value");
+        const span = document.createElement("div");
+        td.append(span);
+        tr.append(td);
       }
+      tbody.append(tr);
+    }
+
+    // table event
+    table.addEventListener("click", (ev) => {
+      if (!["TD", "DIV"].includes(ev.target.nodeName)) return;
+      const target = ev.target.nodeName === "DIV" ? ev.target.parentElement : ev.target;
+      const mode = parseInt(colorSelect.value);
+      if (ev.ctrlKey && mode === 3) {
+        setOdd(target);
+        return;
+      }
+      if (selColor !== null && mode === 4) {
+        setColor(target);
+        return;
+      }
+      if (sel === target) {
+        deselect();
+        return;
+      }
+      select(target);
     });
 
     document.addEventListener("keydown", (ev) => {
       if (ev.keyCode >= 49 && ev.keyCode <= 57 && sel != null) {
-        sel.textContent = ev.keyCode - 48;
+        sel.firstElementChild.textContent = ev.keyCode - 48;
         return;
       }
 
       if ([8, 46, 48].includes(ev.keyCode)) {
-        sel.textContent = null;
+        sel.firstElementChild.textContent = null;
         return;
       }
 
       if (ev.keyCode === 27) {
         deselect();
+        deselectColor();
         return;
       }
 
@@ -228,32 +207,102 @@
       }
     });
 
+    // table odd-even
+    const layoutOddEven = Array.from({ length: 9 }, () => new Array(9).fill(2));
+    function setOdd(target) {
+      const val = layoutOddEven[target.parentElement.rowIndex][target.cellIndex];
+      layoutOddEven[target.parentElement.rowIndex][target.cellIndex] = 3 - val;
+      target.firstElementChild.style.border = val === 2 ? "1px solid black" : "";
+    }
+
+    // table color
+    const layoutColor = Array.from({ length: 9 }, () => new Array(9).fill(8));
+    let selColor = null;
+
+    function selectColor(el) {
+      if (selColor !== null) {
+        deselectColor()
+      }
+      selColor = el;
+      selColor.style.boxShadow = "inset 0px 0px 0px 3px #9a9aa7";
+    }
+
+    function deselectColor() {
+      if (selColor !== null) {
+        selColor.style.boxShadow = "";
+        selColor = null;
+      }
+    }
+
+    function setColor(target) {
+      target.style.backgroundColor = selColor.style.backgroundColor;
+      layoutColor[target.parentElement.rowIndex][target.cellIndex] = selColor.cellIndex;
+    }
+
+    const colorSet = document.getElementById("sudoku_colors");
+    colorSet.addEventListener("click", (ev) => {
+      if (ev.target.nodeName != "TD") return;
+      if (selColor === ev.target) {
+        deselectColor();
+      } else {
+        selectColor(ev.target);
+      }
+    });
+
+    const colorSelect = document.getElementById("sudoku_select");
+    function handleSelectChange() {
+      const mode = parseInt(colorSelect.value);
+      if (mode === 4) {
+        colorSet.hidden = false;
+      } else {
+        colorSet.hidden = true;
+        deselectColor();
+      }
+    }
+    handleSelectChange();
+    colorSelect.addEventListener("change", handleSelectChange);
+
+    // solve
     async function solve() {
-      const body = Array.from(tbody.children).map((row) =>
-        Array.from(row.children).map((el) => (el.textContent ? parseInt(el.textContent) : 0))
+      const values = Array.from(tbody.children).map((row) =>
+        Array.from(row.children).map((el) =>
+          el.firstElementChild.textContent ? parseInt(el.firstElementChild.textContent) : 0
+        )
       );
+
+      const mode = parseInt(colorSelect.value);
 
       const response = await fetch("/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify({
+          mode: parseInt(colorSelect.value),
+          values: values,
+          layout: mode === 3 ? layoutOddEven : mode === 4 ? layoutColor : undefined,
+        }),
       });
 
-      const result = await response.json();
-
-      const rows = tbody.children;
-      for (let i = 0; i < result.length; i++) {
-        for (let j = 0; j < result[i].length; j++) {
-          if (result[i][j] > 0) {
-            rows[i].children[j].textContent = result[i][j];
+      if (response.ok) {
+        errorElement.textContent = "";
+        const result = await response.json();
+        const rows = tbody.children;
+        for (let i = 0; i < result.length; i++) {
+          for (let j = 0; j < result[i].length; j++) {
+            if (result[i][j] > 0) {
+              rows[i].children[j].firstElementChild.textContent = result[i][j];
+            }
           }
         }
+      } else {
+        errorElement.textContent = "Решения нет";
       }
     }
 
-    const btn = document.getElementById("sudoku_btn");
-    btn.addEventListener("click", solve);
+    // elements
+    const btnElement = document.getElementById("sudoku_btn");
+    btnElement.addEventListener("click", solve);
+    const errorElement = document.getElementById("sudoku_error");
   </script>
 </html>
