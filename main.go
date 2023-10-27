@@ -8,10 +8,19 @@ import (
 	"github.com/qsoulior/sudoku-solver/solver"
 )
 
+type Mode uint
+
+const (
+	Classic Mode = iota + 1
+	X
+	OddEven
+	Jigsaw
+)
+
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		var body struct {
-			Mode   int
+			Mode   Mode
 			Values solver.Grid
 			Layout solver.Grid
 		}
@@ -23,36 +32,29 @@ func HandleIndex(w http.ResponseWriter, r *http.Request) {
 		}
 
 		s := solver.New(&body.Values)
-
-		var solved bool
 		switch body.Mode {
-		case 1:
-			s.AddConstraint(&solver.RowConstraint{})
-			s.AddConstraint(&solver.ColumnConstraint{})
-			s.AddConstraint(&solver.SquareConstraint{})
-			// solved = solveClassic(&body.Values)
-		case 2:
-			s.AddConstraint(&solver.RowConstraint{})
-			s.AddConstraint(&solver.ColumnConstraint{})
-			s.AddConstraint(&solver.SquareConstraint{})
-			s.AddConstraint(&solver.PrimaryConstraint{})
-			s.AddConstraint(&solver.SecondaryConstraint{})
-			// solved = solveX(&body.Values)
-		case 3:
-			s.AddConstraint(&solver.RowConstraint{})
-			s.AddConstraint(&solver.ColumnConstraint{})
-			s.AddConstraint(&solver.SquareConstraint{})
-			s.AddConstraint(&solver.OddEvenConstraint{&body.Layout})
-			// solved = solveOddEven(&body.Values, &body.Layout)
-		case 4:
-			s.AddConstraint(&solver.RowConstraint{})
-			s.AddConstraint(&solver.ColumnConstraint{})
-			s.AddConstraint(&solver.FigureConstraint{&body.Layout})
-			// solved = solveFigured(&body.Values, &body.Layout)
+		case Classic:
+			s.AddConstraint(solver.RowConstraint{})
+			s.AddConstraint(solver.ColumnConstraint{})
+			s.AddConstraint(solver.SquareConstraint{})
+		case X:
+			s.AddConstraint(solver.RowConstraint{})
+			s.AddConstraint(solver.ColumnConstraint{})
+			s.AddConstraint(solver.SquareConstraint{})
+			s.AddConstraint(solver.PrimaryConstraint{})
+			s.AddConstraint(solver.SecondaryConstraint{})
+		case OddEven:
+			s.AddConstraint(solver.RowConstraint{})
+			s.AddConstraint(solver.ColumnConstraint{})
+			s.AddConstraint(solver.SquareConstraint{})
+			s.AddConstraint(solver.OddEvenConstraint{&body.Layout})
+		case Jigsaw:
+			s.AddConstraint(solver.RowConstraint{})
+			s.AddConstraint(solver.ColumnConstraint{})
+			s.AddConstraint(solver.ShapeConstraint{&body.Layout})
 		}
-		solved = s.Solve()
 
-		if solved {
+		if s.Solve() {
 			w.Header().Set("Content-Type", "application/json")
 			e := json.NewEncoder(w)
 			e.Encode(body.Values)
