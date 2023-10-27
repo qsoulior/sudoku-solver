@@ -168,11 +168,13 @@
     document.addEventListener("keydown", (ev) => {
       if (ev.keyCode >= 49 && ev.keyCode <= 57 && sel != null) {
         sel.firstElementChild.textContent = ev.keyCode - 48;
+        sel.firstElementChild.style.color = "red"
         return;
       }
 
       if ([8, 46, 48].includes(ev.keyCode)) {
         sel.firstElementChild.textContent = null;
+        sel.firstElementChild.style.color = "black"
         return;
       }
 
