@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sudoku Solver</title>
     <style>
+      * {
+        font-family: sans-serif;
+      }
+
       body {
         display: flex;
         align-items: center;
@@ -221,7 +225,7 @@
 
     function selectColor(el) {
       if (selColor !== null) {
-        deselectColor()
+        deselectColor();
       }
       selColor = el;
       selColor.style.boxShadow = "inset 0px 0px 0px 3px #9a9aa7";

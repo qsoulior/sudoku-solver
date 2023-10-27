@@ -4,14 +4,16 @@ import (
 	"encoding/json"
 	"html/template"
 	"net/http"
+
+	"github.com/qsoulior/sudoku-solver/solver"
 )
 
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		var body struct {
 			Mode   int
-			Values Grid
-			Layout Grid
+			Values solver.Grid
+			Layout solver.Grid
 		}
 		d := json.NewDecoder(r.Body)
 		err := d.Decode(&body)
@@ -20,17 +22,35 @@ func HandleIndex(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		s := solver.New(&body.Values)
+
 		var solved bool
 		switch body.Mode {
 		case 1:
-			solved = solveClassic(&body.Values)
+			s.AddConstraint(&solver.RowConstraint{})
+			s.AddConstraint(&solver.ColumnConstraint{})
+			s.AddConstraint(&solver.SquareConstraint{})
+			// solved = solveClassic(&body.Values)
 		case 2:
-			solved = solveX(&body.Values)
+			s.AddConstraint(&solver.RowConstraint{})
+			s.AddConstraint(&solver.ColumnConstraint{})
+			s.AddConstraint(&solver.SquareConstraint{})
+			s.AddConstraint(&solver.PrimaryConstraint{})
+			s.AddConstraint(&solver.SecondaryConstraint{})
+			// solved = solveX(&body.Values)
 		case 3:
-			solved = solveOddEven(&body.Values, &body.Layout)
+			s.AddConstraint(&solver.RowConstraint{})
+			s.AddConstraint(&solver.ColumnConstraint{})
+			s.AddConstraint(&solver.SquareConstraint{})
+			s.AddConstraint(&solver.OddEvenConstraint{&body.Layout})
+			// solved = solveOddEven(&body.Values, &body.Layout)
 		case 4:
-			solved = solveFigured(&body.Values, &body.Layout)
+			s.AddConstraint(&solver.RowConstraint{})
+			s.AddConstraint(&solver.ColumnConstraint{})
+			s.AddConstraint(&solver.FigureConstraint{&body.Layout})
+			// solved = solveFigured(&body.Values, &body.Layout)
 		}
+		solved = s.Solve()
 
 		if solved {
 			w.Header().Set("Content-Type", "application/json")

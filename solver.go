@@ -1,6 +1,8 @@
 package main
 
-type Grid [9][9]int
+import "github.com/qsoulior/sudoku-solver/solver"
+
+type Grid = solver.Grid
 
 // base
 func isValid(values *Grid, row int, col int, num int) bool {
