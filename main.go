@@ -15,6 +15,7 @@ const (
 	X
 	OddEven
 	Jigsaw
+	Asterix
 )
 
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
@@ -52,6 +53,11 @@ func HandleIndex(w http.ResponseWriter, r *http.Request) {
 			s.AddConstraint(solver.RowConstraint{})
 			s.AddConstraint(solver.ColumnConstraint{})
 			s.AddConstraint(solver.ShapeConstraint{&body.Layout})
+		case Asterix:
+			s.AddConstraint(solver.RowConstraint{})
+			s.AddConstraint(solver.ColumnConstraint{})
+			s.AddConstraint(solver.SquareConstraint{})
+			s.AddConstraint(solver.AsterixConstraint{})
 		}
 
 		if s.Solve() {

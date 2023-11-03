@@ -1,5 +1,9 @@
 package solver
 
+import (
+	"slices"
+)
+
 type Constraint interface {
 	Valid(values *Grid, row int, col int, num uint) bool
 }
@@ -96,4 +100,23 @@ func (c OddEvenConstraint) Valid(values *Grid, row int, col int, num uint) bool 
 		return num%2 == 0
 	}
 	return num%2 != 0
+}
+
+type AsterixConstraint struct {
+}
+
+var indexes = [][2]int{{4, 1}, {2, 2}, {6, 2}, {1, 4}, {4, 4}, {7, 4}, {2, 6}, {6, 6}, {4, 7}}
+
+func (c AsterixConstraint) Valid(values *Grid, row int, col int, num uint) bool {
+	nums := make([]uint, 9)
+	for i := 0; i < 9; i++ {
+		index := indexes[i]
+		nums[i] = values[index[0]][index[1]]
+	}
+
+	if slices.Contains(indexes, [2]int{row, col}) {
+		return !slices.Contains(nums, num)
+	}
+
+	return true
 }
