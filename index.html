@@ -90,15 +90,15 @@
       <table id="sudoku_colors" hidden="true">
         <tbody>
           <tr>
-            <td class="sudoku-color" style="background-color: rgba(255, 0, 0, 0.25)"></td>
-            <td class="sudoku-color" style="background-color: rgba(255, 255, 0, 0.25)"></td>
-            <td class="sudoku-color" style="background-color: rgba(255, 0, 255, 0.25)"></td>
-            <td class="sudoku-color" style="background-color: rgba(0, 255, 0, 0.25)"></td>
-            <td class="sudoku-color" style="background-color: rgba(0, 255, 255, 0.25)"></td>
-            <td class="sudoku-color" style="background-color: rgba(0, 0, 255, 0.25)"></td>
-            <td class="sudoku-color" style="background-color: rgba(255, 100, 0, 0.25)"></td>
-            <td class="sudoku-color" style="background-color: rgba(150, 150, 150, 0.25)"></td>
-            <td class="sudoku-color" style="background-color: rgba(255, 255, 255, 0.25)"></td>
+            <td class="sudoku-color" style="background-color: #ff000040"></td>
+            <td class="sudoku-color" style="background-color: #ffff0040"></td>
+            <td class="sudoku-color" style="background-color: #ff00ff40"></td>
+            <td class="sudoku-color" style="background-color: #00ff0040"></td>
+            <td class="sudoku-color" style="background-color: #00ffff40"></td>
+            <td class="sudoku-color" style="background-color: #0000ff40"></td>
+            <td class="sudoku-color" style="background-color: #ff640040"></td>
+            <td class="sudoku-color" style="background-color: #96969640"></td>
+            <td class="sudoku-color" style="background-color: #ffffff40"></td>
           </tr>
         </tbody>
       </table>
@@ -169,13 +169,13 @@
     document.addEventListener("keydown", (ev) => {
       if (ev.keyCode >= 49 && ev.keyCode <= 57 && sel != null) {
         sel.firstElementChild.textContent = ev.keyCode - 48;
-        sel.firstElementChild.style.color = "red"
+        sel.firstElementChild.style.color = "red";
         return;
       }
 
       if ([8, 46, 48].includes(ev.keyCode)) {
         sel.firstElementChild.textContent = null;
-        sel.firstElementChild.style.color = "black"
+        sel.firstElementChild.style.color = "black";
         return;
       }
 
@@ -261,9 +261,9 @@
       const mode = parseInt(colorSelect.value);
       if (mode === 4) {
         colorSet.hidden = false;
-        table.removeAttribute("inside")
+        table.removeAttribute("inside");
       } else {
-        table.setAttribute("inside", "")
+        table.setAttribute("inside", "");
         colorSet.hidden = true;
         deselectColor();
       }
